@@ -41,21 +41,29 @@ export function App({ animationDurationMs, now, random }: AppProps) {
         status={game.session.status}
       />
 
-      <main className="main-grid">
-        <BallMachine
-          currentNumber={game.revealedCurrentNumber}
-          isSpinning={game.isAnimating}
-          statusLabel={machineStatusCopy[game.session.status]}
-        />
-        <CurrentNumberCard
-          currentNumber={game.revealedCurrentNumber}
-          isSpinning={game.isAnimating}
-          remainingCount={game.remainingCount}
-          statusLabel={machineStatusCopy[game.session.status]}
-        />
-      </main>
+      <div className="app-body-grid">
+        <aside className="panel-left">
+          <BallMachine
+            currentNumber={game.revealedCurrentNumber}
+            isSpinning={game.isAnimating}
+            statusLabel={machineStatusCopy[game.session.status]}
+            onDraw={game.primaryAction.label === "Sortear siguiente" ? game.primaryAction.onClick : undefined}
+          />
+        </aside>
 
-      <DrawHistoryTape drawnNumbers={game.revealedDrawnNumbers} />
+        <section className="panel-right">
+          <CurrentNumberCard
+            currentNumber={game.revealedCurrentNumber}
+            isSpinning={game.isAnimating}
+            remainingCount={game.remainingCount}
+            statusLabel={machineStatusCopy[game.session.status]}
+          />
+        </section>
+      </div>
+
+      <div className="app-history-row">
+        <DrawHistoryTape drawnNumbers={game.revealedDrawnNumbers} />
+      </div>
     </div>
   );
 }

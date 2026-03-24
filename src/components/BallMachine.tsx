@@ -1,9 +1,12 @@
 import type { CSSProperties } from "react";
+import { useState } from "react";
+import { TombolaOperator } from "./TombolaOperator";
 
 interface BallMachineProps {
   currentNumber: number | null;
   isSpinning: boolean;
   statusLabel: string;
+  onDraw?: () => void;
 }
 
 const machineParticles = [
@@ -29,7 +32,22 @@ const machineParticles = [
   { x: "52%", y: "84%", size: "22px", hue: "cream", duration: "3.9s", delay: "-0.1s" },
 ] as const;
 
-export function BallMachine({ currentNumber, isSpinning, statusLabel }: BallMachineProps) {
+export function BallMachine({ currentNumber, isSpinning, statusLabel, onDraw }: BallMachineProps) {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleOperatorClick = () => {
+    if (onDraw && !isAnimating) {
+      setIsAnimating(true);
+      onDraw();
+      // Reset animation state when spinning stops
+      const resetTimeout = setTimeout(() => {
+        setIsAnimating(false);
+      }, 1400); // Match the animation duration from useBingoGame
+
+      return () => clearTimeout(resetTimeout);
+    }
+  };
+
   const formattedNumber = currentNumber === null ? "--" : String(currentNumber).padStart(2, "0");
 
   return (
@@ -65,10 +83,25 @@ export function BallMachine({ currentNumber, isSpinning, statusLabel }: BallMach
           <div className="machine-ring machine-ring-inner" />
         </div>
         <div className="machine-base" />
+
+        <div className={`machine-lever ${isSpinning ? "machine-lever-active" : ""}`}>
+          <div className="lever-pivot" />
+          <div className="lever-arm" />
+          <div className="lever-handle" />
+        </div>
+
         <div className="machine-chute">
           <div className="machine-chute-neck" />
           <div className="machine-chute-tube" />
         </div>
+
+        {onDraw && (
+          <TombolaOperator
+            onActivate={handleOperatorClick}
+            isAnimating={isSpinning}
+            disabled={!onDraw || isSpinning}
+          />
+        )}
         <div
           className={[
             "machine-draw-ball",

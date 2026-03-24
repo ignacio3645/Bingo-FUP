@@ -1,0 +1,6 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "out-file": true,
+        "type": true
+    }
+}
