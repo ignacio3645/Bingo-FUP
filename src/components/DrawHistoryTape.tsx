@@ -39,8 +39,9 @@ export function DrawHistoryTape({ drawnNumbers }: DrawHistoryTapeProps) {
     <section className="history-card">
       <div className="history-header">
         <div>
-          <p className="eyebrow">Historial</p>
-          <h2>Cinta ordenada de numeros sorteados</h2>
+          <p className="eyebrow">La ronda en perspectiva</p>
+          <h2>Lo que ya salio</h2>
+          <p className="section-note">Puedes leerlo por orden de salida o por valor.</p>
         </div>
         <div className="history-controls">
           <button

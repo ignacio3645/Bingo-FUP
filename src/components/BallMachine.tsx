@@ -5,7 +5,6 @@ interface BallMachineProps {
   currentNumber: number | null;
   drawCount: number;
   isSpinning: boolean;
-  statusLabel: string;
   onDraw?: () => void;
 }
 
@@ -36,7 +35,6 @@ export function BallMachine({
   currentNumber,
   drawCount,
   isSpinning,
-  statusLabel,
   onDraw,
 }: BallMachineProps) {
   const handleOperatorClick = () => {
@@ -50,8 +48,12 @@ export function BallMachine({
   return (
     <section className="machine-card">
       <div className="section-copy">
-        <p className="eyebrow">Tombola</p>
-        <h2>Extraccion visual</h2>
+        <h2>TOMBOLA FUPBI</h2>
+        <p className="section-note">
+          {isSpinning
+            ? "La tombola esta girando para encontrar la proxima bolilla"
+            : "Cada giro prepara el proximo numero de la ronda"}
+        </p>
       </div>
 
       <div className={`machine-stage${isSpinning ? " machine-stage-spinning" : ""}`} aria-hidden="true">
@@ -112,7 +114,6 @@ export function BallMachine({
         </div>
       </div>
 
-      <p className="machine-caption">{statusLabel}</p>
     </section>
   );
 }

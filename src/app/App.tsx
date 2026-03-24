@@ -4,13 +4,6 @@ import { DrawHistoryTape } from "../components/DrawHistoryTape";
 import { Header } from "../components/Header";
 import { useBingoGame } from "./useBingoGame";
 
-const machineStatusCopy = {
-  pending: "Esperando activacion del operador",
-  active: "La tombola gira con resultado gobernado por el motor del juego",
-  paused: "Partida detenida temporalmente por el operador",
-  finished: "Sesion cerrada, lista para iniciar una nueva partida",
-} as const;
-
 interface AppProps {
   animationDurationMs?: number;
   now?: () => string;
@@ -26,18 +19,12 @@ export function App({ animationDurationMs, now, random }: AppProps) {
       <div className="app-backdrop app-backdrop-right" />
 
       <Header
-        canFinish={game.canFinish}
-        canPause={game.canPause}
-        canResume={game.session.status === "paused"}
         drawCount={game.session.drawnNumbers.length}
-        onFinish={game.finish}
-        onPause={game.session.status === "paused" ? game.primaryAction.onClick : game.pause}
         onPrimaryAction={game.primaryAction.onClick}
         onReset={game.reset}
         primaryActionDisabled={game.primaryAction.disabled}
         primaryActionLabel={game.primaryAction.label}
         remainingCount={game.remainingCount}
-        status={game.session.status}
       />
 
       <div className="app-body-grid">
@@ -46,7 +33,6 @@ export function App({ animationDurationMs, now, random }: AppProps) {
             currentNumber={game.revealedCurrentNumber}
             drawCount={game.revealedDrawnNumbers.length}
             isSpinning={game.isAnimating}
-            statusLabel={machineStatusCopy[game.session.status]}
             onDraw={game.session.status === "active" ? game.primaryAction.onClick : undefined}
           />
         </aside>
@@ -56,7 +42,6 @@ export function App({ animationDurationMs, now, random }: AppProps) {
             currentNumber={game.revealedCurrentNumber}
             isSpinning={game.isAnimating}
             remainingCount={game.remainingCount}
-            statusLabel={machineStatusCopy[game.session.status]}
           />
         </section>
       </div>
