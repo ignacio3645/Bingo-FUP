@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap");
 
 :root {
   --color-primary: #2C7DA0;
@@ -15,6 +15,7 @@
   --color-text-secondary: #6B7280;
 
   --color-border: #E5E7EB;
+  --color-border-soft: rgba(31, 41, 55, 0.08);
 
   --text-sm: 14px;
   --text-md: 16px;
@@ -32,6 +33,13 @@
 
   --shadow-soft: 0 4px 12px rgba(0,0,0,0.05);
   --shadow-medium: 0 10px 25px rgba(0,0,0,0.08);
+
+  --ink-strong: var(--color-text-primary);
+  --ink-muted: var(--color-text-secondary);
+  --bg-accent: var(--color-primary-dark);
+  --bg-accent-soft: var(--color-primary);
+  --highlight: var(--color-accent);
+  --line-soft: var(--color-border-soft);
 
   color-scheme: light;
   font-family: "Inter", "Segoe UI", -apple-system, sans-serif;
@@ -521,27 +529,30 @@ select:focus {
 }
 
 /* Tombola Operator Styles */
-.tombola-operator {
+.tombola-operator-wrap {
   position: absolute;
-  bottom: 20px;
-  left: 10%;
-  width: 116px;
-  cursor: pointer;
+  bottom: 14px;
+  left: 8%;
+  width: 144px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   z-index: 11;
+}
+
+.tombola-operator {
+  width: 116px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
   transition: transform 0.15s ease;
   user-select: none;
 }
 
 .tombola-operator:not(.disabled):hover {
   transform: translateY(-2px) scale(1.04);
-}
-
-.tombola-operator:not(.disabled):active {
-  transform: translateY(1px) scale(0.96);
-}
-
-.tombola-operator:not(.disabled):hover {
-  transform: translateY(-2px) scale(1.03);
 }
 
 .tombola-operator:not(.disabled):active {
@@ -557,22 +568,49 @@ select:focus {
   animation: operator-body-action 0.9s ease-in-out;
 }
 
-.operator-svg {
+.operator-avatar-image {
   width: 100%;
   height: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 14px rgba(12, 35, 43, 0.24));
 }
 
-.operator-left-arm,
-.operator-right-arm {
-  transform-origin: 60px 105px;
+.operator-avatar-fallback {
+  display: grid;
+  place-items: center;
+  width: 116px;
+  aspect-ratio: 3 / 5;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #f3f6f8, #dbe7ee);
+  color: var(--color-primary-dark);
+  font-family: "Sora", sans-serif;
+  font-size: 2rem;
 }
 
-.tombola-operator.animating .operator-right-arm {
-  animation: operator-arm-push 0.9s ease-in-out;
+.avatar-switcher-button {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #f8fbfd;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
 }
 
-.tombola-operator.animating .operator-left-arm {
-  animation: operator-arm-balance 0.9s ease-in-out;
+.avatar-switcher-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 8px 18px rgba(8, 28, 37, 0.18);
+}
+
+.avatar-switcher-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
 }
 
 .machine-stage.machine-stage-spinning .machine-sphere {
@@ -585,20 +623,6 @@ select:focus {
   50% { transform: translateY(0) rotate(0deg); }
   75% { transform: translateY(-1px) rotate(1deg); }
   100% { transform: translateY(0) rotate(0deg); }
-}
-
-@keyframes operator-arm-push {
-  0% { transform: rotate(0deg); }
-  30% { transform: rotate(-40deg); }
-  60% { transform: rotate(-30deg); }
-  100% { transform: rotate(0deg); }
-}
-
-@keyframes operator-arm-balance {
-  0% { transform: rotate(0deg); }
-  30% { transform: rotate(16deg); }
-  60% { transform: rotate(12deg); }
-  100% { transform: rotate(0deg); }
 }
 
 @keyframes machine-spin {
@@ -650,7 +674,7 @@ select:focus {
 .machine-draw-ball {
   position: absolute;
   left: 50%;
-  bottom: 86px;
+  bottom: 84px;
   display: inline-grid;
   place-items: center;
   width: 88px;
@@ -665,8 +689,9 @@ select:focus {
     inset -10px -12px 18px rgba(142, 82, 19, 0.28),
     0 18px 36px rgba(16, 39, 32, 0.22);
   opacity: 0;
-  transform: translate(-50%, 6px) scale(0.42);
+  transform: translate(-50%, 8px) scale(0.42);
   transition: transform 180ms ease, opacity 180ms ease;
+  z-index: 9;
 }
 
 .machine-draw-ball-visible {
@@ -677,16 +702,6 @@ select:focus {
 .machine-draw-ball-hidden {
   opacity: 0;
   transform: translate(-50%, 4px) scale(0.38);
-}
-
-.machine-draw-ball-visible {
-  opacity: 1;
-  transform: translate(0, 0) scale(1);
-}
-
-.machine-draw-ball-hidden {
-  opacity: 0;
-  transform: translate(-76px, -34px) scale(0.38);
 }
 
 .machine-draw-ball-pop {
@@ -892,22 +907,22 @@ select:focus {
 @keyframes ball-reveal {
   0% {
     opacity: 0;
-    transform: translate(-76px, -34px) scale(0.38);
+    transform: translate(calc(-50% - 56px), -34px) scale(0.34);
   }
 
-  55% {
+  58% {
     opacity: 1;
-    transform: translate(-36px, -14px) scale(0.84);
+    transform: translate(calc(-50% - 18px), -14px) scale(0.84);
   }
 
-  78% {
+  82% {
     opacity: 1;
-    transform: translate(8px, 4px) scale(1.08);
+    transform: translate(-50%, 6px) scale(1.05);
   }
 
   100% {
     opacity: 1;
-    transform: translate(0, 0) scale(1);
+    transform: translate(-50%, 0) scale(1);
   }
 }
 
@@ -962,23 +977,8 @@ select:focus {
   }
 }
 
-@keyframes operator-arm-balance {
-  0% {
-    transform: rotate(0deg);
-  }
-  30% {
-    transform: rotate(25deg);
-  }
-  60% {
-    transform: rotate(20deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-
 @media (max-width: 1180px) {
-  .main-grid {
+  .app-body-grid {
     grid-template-columns: 1fr;
   }
 

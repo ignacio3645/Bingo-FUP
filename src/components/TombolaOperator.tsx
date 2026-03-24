@@ -1,18 +1,49 @@
-import { useState } from "react";
-import type { CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface TombolaOperatorProps {
   onActivate?: () => void;
   isAnimating?: boolean;
   disabled?: boolean;
+  drawCount?: number;
 }
+
+type AvatarModuleMap = Record<string, string>;
+
+const avatarModules = import.meta.glob("../assets/*.{png,jpg,jpeg,webp,avif,svg}", {
+  eager: true,
+  import: "default",
+}) as AvatarModuleMap;
+
+const avatarOptions = Object.entries(avatarModules)
+  .sort(([leftPath], [rightPath]) => leftPath.localeCompare(rightPath))
+  .map(([path, src], index) => {
+    const filename = path.split("/").at(-1)?.replace(/\.[^.]+$/, "") ?? `avatar-${index + 1}`;
+    const label = filename.replace(/[-_]+/g, " ");
+
+    return {
+      src,
+      label,
+    };
+  });
 
 export function TombolaOperator({
   onActivate,
   isAnimating = false,
   disabled = false,
+  drawCount = 0,
 }: TombolaOperatorProps) {
   const [isPushing, setIsPushing] = useState(false);
+  const [avatarIndex, setAvatarIndex] = useState(0);
+  const currentAvatar = avatarOptions[avatarIndex];
+  const previousDrawCountRef = useRef(drawCount);
+
+  const avatarButtonLabel = useMemo(() => {
+    if (!currentAvatar) {
+      return "Operador de la tombola";
+    }
+
+    return `Sortear numero con avatar ${currentAvatar.label}`;
+  }, [currentAvatar]);
 
   const handleClick = () => {
     if (!disabled && !isAnimating && onActivate) {
@@ -22,72 +53,57 @@ export function TombolaOperator({
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if ((e.key === "Enter" || e.key === " ") && !disabled && !isAnimating && onActivate) {
-      e.preventDefault();
-      setIsPushing(true);
-      onActivate();
-      window.setTimeout(() => setIsPushing(false), 400);
+  const handleAvatarChange = () => {
+    if (avatarOptions.length > 1) {
+      setAvatarIndex((currentIndex) => (currentIndex + 1) % avatarOptions.length);
     }
   };
 
+  useEffect(() => {
+    if (
+      avatarOptions.length > 1 &&
+      drawCount > previousDrawCountRef.current &&
+      drawCount % 5 === 0
+    ) {
+      setAvatarIndex((currentIndex) => (currentIndex + 1) % avatarOptions.length);
+    }
+
+    previousDrawCountRef.current = drawCount;
+  }, [drawCount]);
+
   return (
-    <div
-      className={`tombola-operator ${isAnimating ? "animating" : ""} ${isPushing ? "pushing" : ""} ${disabled ? "disabled" : ""}`}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      role="button"
-      tabIndex={disabled ? -1 : 0}
-      aria-label="Sortear número"
-      aria-disabled={disabled}
-      style={
-        {
-          "--animation-duration": "0.8s",
-        } as CSSProperties
-      }
-    >
-      <svg
-        viewBox="0 0 200 340"
-        xmlns="http://www.w3.org/2000/svg"
-        className="operator-svg"
+    <div className="tombola-operator-wrap">
+      <button
+        className={`tombola-operator ${isAnimating ? "animating" : ""} ${isPushing ? "pushing" : ""} ${disabled ? "disabled" : ""}`}
+        onClick={handleClick}
+        type="button"
+        aria-label={avatarButtonLabel}
+        aria-disabled={disabled}
+        disabled={disabled}
       >
-        {/* Cabeza simple sin rasgos */}
-        <ellipse cx="100" cy="58" rx="30" ry="36" fill="#fde5c4" />
+        {currentAvatar ? (
+          <img
+            src={currentAvatar.src}
+            alt={currentAvatar.label}
+            className="operator-avatar-image"
+            draggable="false"
+          />
+        ) : (
+          <span className="operator-avatar-fallback" aria-hidden="true">
+            ?
+          </span>
+        )}
+      </button>
 
-        {/* Pelo corto bob rubio */}
-        <path
-          d="M 65 55 Q 68 18 100 18 Q 132 18 135 55 Q 138 80 110 80 Q 90 80 70 80 Z"
-          fill="#f4bf4e"
-        />
-
-        {/* Cuello */}
-        <rect x="90" y="85" width="20" height="12" fill="#fde5c4" />
-
-        {/* Torso azul mostaza */}
-        <rect x="72" y="97" width="56" height="70" rx="12" fill="#c18812" />
-
-        {/* Pantalón gris oscuro */}
-        <rect x="76" y="168" width="48" height="64" rx="12" fill="#444" />
-
-        {/* Piernas */}
-        <rect x="80" y="232" width="12" height="30" rx="6" fill="#222" />
-        <rect x="108" y="232" width="12" height="30" rx="6" fill="#222" />
-
-        {/* Zapatos negros */}
-        <rect x="76" y="262" width="20" height="8" rx="4" fill="#111" />
-        <rect x="104" y="262" width="20" height="8" rx="4" fill="#111" />
-
-        {/* Brazos */}
-        <g className="operator-left-arm">
-          <rect x="53" y="104" width="20" height="64" rx="8" fill="#fde5c4" />
-          <rect x="50" y="150" width="26" height="18" rx="8" fill="#c18812" />
-        </g>
-
-        <g className="operator-right-arm">
-          <rect x="127" y="104" width="20" height="64" rx="8" fill="#fde5c4" />
-          <rect x="124" y="150" width="26" height="18" rx="8" fill="#c18812" />
-        </g>
-      </svg>
+      <button
+        className="avatar-switcher-button"
+        onClick={handleAvatarChange}
+        type="button"
+        disabled={avatarOptions.length <= 1}
+        aria-label="Cambiar avatar"
+      >
+        Cambiar avatar
+      </button>
     </div>
   );
 }

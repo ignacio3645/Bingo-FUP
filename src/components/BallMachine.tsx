@@ -1,9 +1,9 @@
 import type { CSSProperties } from "react";
-import { useState } from "react";
 import { TombolaOperator } from "./TombolaOperator";
 
 interface BallMachineProps {
   currentNumber: number | null;
+  drawCount: number;
   isSpinning: boolean;
   statusLabel: string;
   onDraw?: () => void;
@@ -32,19 +32,16 @@ const machineParticles = [
   { x: "52%", y: "84%", size: "22px", hue: "cream", duration: "3.9s", delay: "-0.1s" },
 ] as const;
 
-export function BallMachine({ currentNumber, isSpinning, statusLabel, onDraw }: BallMachineProps) {
-  const [isAnimating, setIsAnimating] = useState(false);
-
+export function BallMachine({
+  currentNumber,
+  drawCount,
+  isSpinning,
+  statusLabel,
+  onDraw,
+}: BallMachineProps) {
   const handleOperatorClick = () => {
-    if (onDraw && !isAnimating) {
-      setIsAnimating(true);
+    if (onDraw && !isSpinning) {
       onDraw();
-      // Reset animation state when spinning stops
-      const resetTimeout = setTimeout(() => {
-        setIsAnimating(false);
-      }, 1400); // Match the animation duration from useBingoGame
-
-      return () => clearTimeout(resetTimeout);
     }
   };
 
@@ -95,13 +92,12 @@ export function BallMachine({ currentNumber, isSpinning, statusLabel, onDraw }: 
           <div className="machine-chute-tube" />
         </div>
 
-        {onDraw && (
-          <TombolaOperator
-            onActivate={handleOperatorClick}
-            isAnimating={isSpinning}
-            disabled={!onDraw || isSpinning}
-          />
-        )}
+        <TombolaOperator
+          onActivate={handleOperatorClick}
+          drawCount={drawCount}
+          isAnimating={isSpinning}
+          disabled={!onDraw || isSpinning}
+        />
         <div
           className={[
             "machine-draw-ball",

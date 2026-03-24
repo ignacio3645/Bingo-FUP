@@ -9,7 +9,6 @@ const machineStatusCopy = {
   active: "La tombola gira con resultado gobernado por el motor del juego",
   paused: "Partida detenida temporalmente por el operador",
   finished: "Sesion cerrada, lista para iniciar una nueva partida",
-  cancelled: "Sesion cancelada",
 } as const;
 
 interface AppProps {
@@ -45,9 +44,10 @@ export function App({ animationDurationMs, now, random }: AppProps) {
         <aside className="panel-left">
           <BallMachine
             currentNumber={game.revealedCurrentNumber}
+            drawCount={game.revealedDrawnNumbers.length}
             isSpinning={game.isAnimating}
             statusLabel={machineStatusCopy[game.session.status]}
-            onDraw={game.primaryAction.label === "Sortear siguiente" ? game.primaryAction.onClick : undefined}
+            onDraw={game.session.status === "active" ? game.primaryAction.onClick : undefined}
           />
         </aside>
 

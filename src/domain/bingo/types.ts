@@ -1,4 +1,4 @@
-export type GameStatus = "pending" | "active" | "paused" | "finished" | "cancelled";
+export type GameStatus = "pending" | "active" | "paused" | "finished";
 
 export type AuditEventType =
   | "session_created"

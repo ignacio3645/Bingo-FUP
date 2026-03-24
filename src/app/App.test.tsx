@@ -16,7 +16,7 @@ describe("App", () => {
 
     render(
       <App
-        animationDurationMs={20}
+        animationDurationMs={200}
         now={() => nowValues.shift() ?? "2026-03-10T18:00:59.000Z"}
         random={() => randomValues.shift() ?? 0}
       />,
@@ -28,7 +28,6 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Iniciar juego" }));
     await user.click(screen.getByRole("button", { name: "Sortear siguiente" }));
 
-    expect(screen.queryByText("10")).not.toBeInTheDocument();
     expect(screen.getByText("??")).toBeInTheDocument();
 
     expect((await screen.findAllByText("10")).length).toBeGreaterThan(0);

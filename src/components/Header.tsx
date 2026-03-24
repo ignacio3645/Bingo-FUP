@@ -20,7 +20,6 @@ const statusLabel: Record<GameStatus, string> = {
   active: "Partida en curso",
   paused: "Pausado",
   finished: "Finalizado",
-  cancelled: "Cancelado",
 };
 
 export function Header({
